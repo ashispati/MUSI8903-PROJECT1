@@ -18,7 +18,7 @@ public:
     
     ~IIRCombFilter();
     
-    void processFilter(float **inputAudioData, float **outputAudioData, int numChannels) override;
+    void processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec) override;
     
     void setDelayLineInSecs(float paramVal) override;
     void setWeight(float paramVal) override;

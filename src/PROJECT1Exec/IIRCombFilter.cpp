@@ -18,7 +18,7 @@ IIRCombFilter::~IIRCombFilter() {
     this->reset();
 }
 
-void IIRCombFilter::processFilter(float **inputAudioData, float **ouputAudioData, int numChannels) {
+void IIRCombFilter::processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec) {
     
 }
 

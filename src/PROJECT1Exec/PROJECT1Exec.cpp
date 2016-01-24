@@ -51,6 +51,7 @@ int main(int argc, char* argv[])
         ppfAudioData[i] = new float[fileLength/spec.iNumChannels];
     }
     
+    
     long long int numFrames = fileLength/spec.iNumChannels;
     phAudioFile->readData(ppfAudioData, numFrames);
     
@@ -59,7 +60,7 @@ int main(int argc, char* argv[])
     cout << spec.fSampleRateInHz << endl;
     
     
-
+    
     //////////////////////////////////////////////////////////////////////////////
     // do processing
     cout << "Hello there!" << endl << endl;

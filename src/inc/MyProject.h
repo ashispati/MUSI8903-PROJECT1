@@ -2,6 +2,7 @@
 #define __MyProject_hdr__
 
 #include "ErrorDef.h"
+#include "AudioFileIf.h"
 
 #define MyProject_VERSION_MAJOR 1
 #define MyProject_VERSION_MINOR 0
@@ -35,7 +36,7 @@ public:
 	virtual void setDelayLineInSecs(float paramVal);
 	virtual void setWeight(float paramVal);
 	//filtering function
-	virtual void processFilter(float **inputAudioData, float **outputAudioData, int numChannels) = 0;
+    virtual void processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec) = 0;
     
     //virtual Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames) = 0;
 
