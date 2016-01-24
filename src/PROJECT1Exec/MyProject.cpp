@@ -91,7 +91,7 @@ Error_t CMyProject::reset ()
 {
     // reset buffers and variables to default values
 	delayLineInSecs = 0.0;
-	weight = 0.0;
+	gain = 0.0;
     return kNoError;
 }
 
@@ -100,9 +100,9 @@ float CMyProject::getDelayLineInSecs()
 	return delayLineInSecs;
 }
 
-float CMyProject::getWeight()
+float CMyProject::getGain()
 {
-	return weight;
+	return gain;
 }
 
 void CMyProject::setDelayLineInSecs(float paramVal)
@@ -110,9 +110,9 @@ void CMyProject::setDelayLineInSecs(float paramVal)
 	delayLineInSecs = paramVal;
 }
 
-void CMyProject::setWeight(float paramVal)
+void CMyProject::setGain(float paramVal)
 {
-	weight = paramVal;
+	gain = paramVal;
 }
 
 long int CMyProject::getDelayLineInSamples(long int fs)

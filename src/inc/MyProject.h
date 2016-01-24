@@ -31,10 +31,10 @@ public:
     Error_t reset ();
 
 	float getDelayLineInSecs();
-	float getWeight();
+	float getGain();
 	//Set functions
 	virtual void setDelayLineInSecs(float paramVal);
-	virtual void setWeight(float paramVal);
+	virtual void setGain(float paramVal);
 	//filtering function
     virtual void processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec) = 0;
     
@@ -45,11 +45,8 @@ protected:
     virtual ~CMyProject ();
 	long int getDelayLineInSamples(long int fs);
 	float delayLineInSecs;
-	float weight;
+	float gain;
     
 };
 
 #endif // #if !defined(__MyProject_hdr__)
-
-
-

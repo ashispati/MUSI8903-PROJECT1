@@ -22,7 +22,7 @@ IIRCombFilter::~IIRCombFilter() {
 void IIRCombFilter::processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec) {
     //Initialize delay line
     long int delayLength = getDelayLineInSamples(spec.fSampleRateInHz);
-    int delayLine[delayLength];
+    int *delayLine = new int(delayLength);
     
     //Implement filter
     int audioLength = (sizeof(inputAudioData)/sizeof(float))/spec.iNumChannels;
@@ -31,7 +31,7 @@ void IIRCombFilter::processFilter(float **inputAudioData, float **outputAudioDat
             delayLine[k] = 0;
         }
         for (int dataId = 0; dataId < audioLength; dataId++) {
-            outputAudioData[channelId][dataId] = inputAudioData[channelId][dataId] + weight*delayLine[delayLength-1];
+            outputAudioData[channelId][dataId] = inputAudioData[channelId][dataId] + gain*delayLine[delayLength-1];
             for (int i = 0; i < delayLength-1; i++) {
                 delayLine[i+1] = delayLine[i];
             }
@@ -44,11 +44,11 @@ void IIRCombFilter::setDelayLineInSecs(float paramVal) {
     delayLineInSecs = paramVal;
 }
 
-void IIRCombFilter::setWeight(float paramVal) {
+void IIRCombFilter::setGain(float paramVal) {
 	if (fabs(paramVal) > 1)
 	{
-		std::cout << "Incorrect parameter value for filter weight. Magnitude should be <= 1";
+		std::cout << "Incorrect parameter value for filter gain. Magnitude should be <= 1";
 		exit(0);
 	}
-    weight = paramVal;
+    gain = paramVal;
 }
