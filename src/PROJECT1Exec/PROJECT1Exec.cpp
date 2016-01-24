@@ -59,8 +59,6 @@ int main(int argc, char* argv[])
     cout << spec.fSampleRateInHz << endl;
     
     
-    
-    
 
     //////////////////////////////////////////////////////////////////////////////
     // do processing

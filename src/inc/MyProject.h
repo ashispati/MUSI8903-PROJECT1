@@ -42,6 +42,7 @@ public:
 protected:
     CMyProject ();
     virtual ~CMyProject ();
+	long int getDelayLineInSamples(long int fs);
 	float delayLineInSecs;
 	float weight;
     
