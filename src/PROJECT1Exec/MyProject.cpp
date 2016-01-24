@@ -114,3 +114,8 @@ void CMyProject::setWeight(float paramVal)
 {
 	weight = paramVal;
 }
+
+long int CMyProject::getDelayLineInSamples(long int fs)
+{
+	return fs / delayLineInSecs;
+}
