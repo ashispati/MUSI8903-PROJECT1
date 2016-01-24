@@ -32,18 +32,16 @@ public:
 	float getDelayLineInSecs();
 	float getWeight();
 	//Set functions
-	void setDelayLineInSecs(float paramVal);
-	void setWeight(float paramVal);
+	virtual void setDelayLineInSecs(float paramVal);
+	virtual void setWeight(float paramVal);
 	//filtering function
-	virtual void processFilter(float **audioData, int numChannels) = 0;
+	virtual void processFilter(float **inputAudioData, float **outputAudioData, int numChannels) = 0;
     
     //virtual Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames) = 0;
 
 protected:
     CMyProject ();
     virtual ~CMyProject ();
-
-private:
 	float delayLineInSecs;
 	float weight;
     

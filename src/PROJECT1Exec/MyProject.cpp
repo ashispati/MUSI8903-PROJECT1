@@ -5,6 +5,8 @@
 #include "ErrorDef.h"
 
 #include "MyProject.h"
+#include "FIRCombFilter.h"
+#include "IIRCombFilter.h"
 
 static const char*  kCMyProjectBuildDate             = __DATE__;
 

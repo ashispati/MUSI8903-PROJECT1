@@ -2,7 +2,7 @@
 #include <iostream>
 #include <ctime>
 
-#include "MUSI8903Config.h"
+#include "PROJECT1Config.h"
 
 #include "AudioFileIf.h"
 
