@@ -9,19 +9,12 @@
 static const char*  kCMyProjectBuildDate             = __DATE__;
 
 
-Error_t CMyProject::create(CMyProject*& pCMyProject, int type)
+CMyProject::CMyProject ()
 {
-	if (type == 0)
-		pCMyProject = new FIRCombFilter();
-	else
-		pCMyProject = new IIRCombFilter();
-
-	if (!pCMyProject)
-		return kUnknownError;
-
-
-	return kNoError;
+    // this never hurts
+    this->reset ();
 }
+
 
 CMyProject::~CMyProject ()
 {
@@ -35,13 +28,13 @@ const int  CMyProject::getVersion (const Version_t eVersionIdx)
     switch (eVersionIdx)
     {
     case kMajor:
-            iVersion    = MyProject_VERSION_MAJOR;
+        iVersion    = MyProject_VERSION_MAJOR;
         break;
     case kMinor:
-            iVersion    = MyProject_VERSION_MINOR;
+        iVersion    = MyProject_VERSION_MINOR; 
         break;
     case kPatch:
-            iVersion    = MyProject_VERSION_PATCH;
+        iVersion    = MyProject_VERSION_PATCH; 
         break;
     case kNumVersionInts:
         iVersion    = -1;
@@ -55,15 +48,18 @@ const char*  CMyProject::getBuildDate ()
     return kCMyProjectBuildDate;
 }
 
-Error_t CMyProject::create (CMyProject*& pCMyProject)
+Error_t CMyProject::create(CMyProject*& pCMyProject, int type)
 {
-    pCMyProject = new CMyProject ();
+	if (type == 0)
+		pCMyProject = new FIRCombFilter();
+	else
+		pCMyProject = new IIRCombFilter();
 
-    if (!pCMyProject)
-        return kUnknownError;
+	if (!pCMyProject)
+		return kUnknownError;
 
 
-    return kNoError;
+	return kNoError;
 }
 
 Error_t CMyProject::destroy (CMyProject*& pCMyProject)
