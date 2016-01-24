@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
     
     CAudioFileIf::FileSpec_t spec;
     phAudioFile->getFileSpec(spec);
-    long long int iInFileLength;
+
     phAudioFile->getLength(iInFileLength);
 
     inputAudioData = new float*[spec.iNumChannels];
