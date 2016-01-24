@@ -6,7 +6,8 @@
 //
 //
 
-#include <stdio.h>
+#include <iostream>
+#include <cmath>
 
 #include "IIRCombFilter.h"
 
@@ -27,5 +28,10 @@ void IIRCombFilter::setDelayLineInSecs(float paramVal) {
 }
 
 void IIRCombFilter::setWeight(float paramVal) {
+	if (fabs(paramVal) > 1)
+	{
+		std::cout << "Incorrect parameter value for filter weight. Should be <= 1";
+		exit(0);
+	}
     weight = paramVal;
 }
