@@ -23,8 +23,8 @@ public:
     static const int  getVersion (const Version_t eVersionIdx);
     static const char* getBuildDate ();
 
-    static Error_t create (CMyProject*& pCKortIf);
-    static Error_t destroy (CMyProject*& pCKortIf);
+	static Error_t create(CMyProject*& pCKortIf, int type);
+	static Error_t destroy (CMyProject*& pCKortIf);
     
     Error_t init (/*enter parameters here*/);
     Error_t reset ();

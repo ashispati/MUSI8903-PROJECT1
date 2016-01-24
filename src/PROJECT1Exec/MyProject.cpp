@@ -9,12 +9,19 @@
 static const char*  kCMyProjectBuildDate             = __DATE__;
 
 
-CMyProject::CMyProject ()
+Error_t CMyProject::create(CMyProject*& pCMyProject, int type)
 {
-    // this never hurts
-    this->reset ();
-}
+	if (type == 0)
+		pCMyProject = new FIRCombFilter();
+	else
+		pCMyProject = new IIRCombFilter();
 
+	if (!pCMyProject)
+		return kUnknownError;
+
+
+	return kNoError;
+}
 
 CMyProject::~CMyProject ()
 {
