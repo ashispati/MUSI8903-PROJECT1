@@ -6,7 +6,8 @@
 //
 //
 
-#include <stdio.h>
+#include <iostream>
+#include <cmath>
 
 #include "FIRCombFilter.h"
 
