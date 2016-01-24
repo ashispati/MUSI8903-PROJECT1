@@ -28,13 +28,13 @@ const int  CMyProject::getVersion (const Version_t eVersionIdx)
     switch (eVersionIdx)
     {
     case kMajor:
-        iVersion    = MyProject_VERSION_MAJOR;
+            iVersion    = MyProject_VERSION_MAJOR;
         break;
     case kMinor:
-        iVersion    = MyProject_VERSION_MINOR; 
+            iVersion    = MyProject_VERSION_MINOR;
         break;
     case kPatch:
-        iVersion    = MyProject_VERSION_PATCH; 
+            iVersion    = MyProject_VERSION_PATCH;
         break;
     case kNumVersionInts:
         iVersion    = -1;

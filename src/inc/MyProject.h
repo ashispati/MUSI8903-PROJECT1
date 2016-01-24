@@ -3,6 +3,10 @@
 
 #include "ErrorDef.h"
 
+#define MyProject_VERSION_MAJOR 1
+#define MyProject_VERSION_MINOR 0
+#define MyProject_VERSION_PATCH 0
+
 class CMyProject
 {
 public:
@@ -42,6 +46,7 @@ protected:
 private:
 	float delayLineInSecs;
 	float weight;
+    
 };
 
 #endif // #if !defined(__MyProject_hdr__)
