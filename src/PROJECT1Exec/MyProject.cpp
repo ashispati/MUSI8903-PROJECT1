@@ -117,5 +117,5 @@ void CMyProject::setGain(float paramVal)
 
 long int CMyProject::getDelayLineInSamples(long int fs)
 {
-	return fs / delayLineInSecs;
+	return fs*delayLineInSecs;
 }

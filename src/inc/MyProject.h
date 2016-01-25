@@ -36,7 +36,7 @@ public:
 	virtual void setDelayLineInSecs(float paramVal);
 	virtual void setGain(float paramVal);
 	//filtering function
-    virtual void processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec) = 0;
+    virtual void processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec, long long iInFileLength) = 0;
     
     //virtual Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames) = 0;
 

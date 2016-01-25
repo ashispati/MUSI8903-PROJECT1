@@ -19,28 +19,31 @@ FIRCombFilter::~FIRCombFilter() {
     this->reset();
 }
 
-void FIRCombFilter::processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec) {
+void FIRCombFilter::processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec, long long iInFileLength) {
     
     //Initialize delay line
     long int delayLength = getDelayLineInSamples(spec.fSampleRateInHz);
-    int *delayLine = new int(delayLength);
+    float *delayLine = new float(delayLength);
+    
+    std::cout << gain << std::endl;
     
     //Implement filter
-    int audioLength = (sizeof(inputAudioData)/sizeof(float))/spec.iNumChannels;
     for (int channelId = 0; channelId < spec.iNumChannels; channelId++) {
         for (int k = 0; k < delayLength; k++) {
             delayLine[k] = 0;
         }
-        for (int dataId = 0; dataId < audioLength; dataId++) {
+        for (int dataId = 0; dataId < iInFileLength; dataId++) {
             outputAudioData[channelId][dataId] = inputAudioData[channelId][dataId] + gain*delayLine[delayLength-1];
-            for (int i = 0; i < delayLength-1; i++) {
-                delayLine[i+1] = delayLine[i];
+            for (int i = delayLength-1; i > 0 ; i--) {
+                delayLine[i] = delayLine[i-1];
             }
             delayLine[0] = inputAudioData[channelId][dataId];
         }
     }
     
+    std::cout << inputAudioData[0][0] << std::endl;
     
+    free(delayLine);
 }
 
 void FIRCombFilter::setDelayLineInSecs(float paramVal) {

@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 	
 	switch (argc)
 	{
-	case 1: cout << "Too few arguments. Enter Filename.";
+	case 1: cout << "Too few arguments. Enter Filename." << endl;
 		exit(0);
 		break;
 	case 2: sInputFilePath = argv[1];
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 		delayLength = atof(argv[3]);
 		gain = atof(argv[4]);
 		break;
-	default: cout << "Too many parameters. Check what you're entering.";
+	default: cout << "Too many parameters. Check what you're entering." << endl;
 		exit(0);
 	}
 	
@@ -69,9 +69,6 @@ int main(int argc, char* argv[])
     phAudioFile->openFile(sInputFilePath, CAudioFileIf::FileIoType_t::kFileRead);
     sOutputFilePath = sInputFilePath + "output.txt";
 	sInput2TxtPath = sInputFilePath + "input.txt";
-	std::ofstream outfile,infile;
-	outfile.open(sOutputFilePath);
-	infile.open(sInput2TxtPath);
     
     CAudioFileIf::FileSpec_t spec;
     phAudioFile->getFileSpec(spec);
@@ -83,12 +80,13 @@ int main(int argc, char* argv[])
     
     for(int i = 0; i < spec.iNumChannels; i++)
     {
-        inputAudioData[i] = new float[iInFileLength/spec.iNumChannels];
-		outputAudioData[i] = new float[iInFileLength / spec.iNumChannels];
+        inputAudioData[i] = new float[iInFileLength];
+		outputAudioData[i] = new float[iInFileLength];
     }
     
-    long long int numFrames = iInFileLength /spec.iNumChannels;
+    long long int numFrames = iInFileLength;
     phAudioFile->readData(inputAudioData, numFrames);
+    
     
     //////////////////////////////////////////////////////////////////////////////
     // do processing
@@ -96,15 +94,20 @@ int main(int argc, char* argv[])
 	CMyProject::create(filter, type);
 	filter->setDelayLineInSecs(delayLength);
 	filter->setGain(gain);
-	filter->processFilter(inputAudioData, outputAudioData, spec);
+	filter->processFilter(inputAudioData, outputAudioData, spec, iInFileLength);
 	
-	// write data to files
+    
+    cout << "Exited" << endl;
+    // write data to files
+    std::ofstream outfile,infile;
+    outfile.open(sOutputFilePath);
+    infile.open(sInput2TxtPath);
 	for (int i = 0; i < spec.iNumChannels; i++)
 	{
-		for (int j = 0; j < iInFileLength / spec.iNumChannels; j++)
+		for (int j = 0; j < iInFileLength; j++)
 		{
-			outfile << outputAudioData[i][j];
-			infile << inputAudioData[i][j];
+			outfile << outputAudioData[i][j] << " ";
+			infile << inputAudioData[i][j] << " ";
 		}
 		outfile << endl;
 		infile << endl;
@@ -122,6 +125,7 @@ int main(int argc, char* argv[])
 	CAudioFileIf::destroy(phAudioFile);
 	CMyProject::destroy(filter);
 
+    cout << "Done Processing" << endl;
     return 0;
     
 }
@@ -129,8 +133,8 @@ int main(int argc, char* argv[])
 
 void     showClInfo()
 {
-    cout << "GTCMT MUSI8903" << endl;
-    cout << "(c) 2016 by Alexander Lerch" << endl;
+    cout << "GTCMT MUSI-8903" << endl;
+    cout << "(c) 2016 by Sid and Ashis" << endl;
     cout  << endl;
 
     return;

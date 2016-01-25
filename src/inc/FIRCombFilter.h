@@ -18,7 +18,7 @@ public:
     
     ~FIRCombFilter();
     
-    void processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec) override;
+    void processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec, long long iInFileLength) override;
     
     void setDelayLineInSecs(float paramVal) override;
     void setGain(float paramVal) override;
