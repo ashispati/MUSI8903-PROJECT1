@@ -25,23 +25,25 @@ void IIRCombFilter::processFilter(float **inputAudioData, float **outputAudioDat
     long int delayLength = getDelayLineInSamples(spec.fSampleRateInHz);
     float *delayLine = new float(delayLength);
     
-    std::cout << gain << std::endl;
-    
     //Implement filter
     for (int channelId = 0; channelId < spec.iNumChannels; channelId++) {
         for (int k = 0; k < delayLength; k++) {
-            delayLine[k] = 0;
+            delayLine[k] = 0.0F;
         }
         for (int dataId = 0; dataId < iInFileLength; dataId++) {
             outputAudioData[channelId][dataId] = inputAudioData[channelId][dataId] + gain*delayLine[delayLength-1];
-            for (int i = delayLength - 1; i > 0 ; i--) {
+            
+            for (int i = delayLength-1; i > 0 ; i--) {
                 delayLine[i] = delayLine[i-1];
             }
+            
             delayLine[0] = outputAudioData[channelId][dataId];
+            
         }
     }
     
     free(delayLine);
+
 }
 
 void IIRCombFilter::setDelayLineInSecs(float paramVal) {

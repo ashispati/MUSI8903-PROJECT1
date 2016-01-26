@@ -114,7 +114,10 @@ int main(int argc, char* argv[])
 	}
     //////////////////////////////////////////////////////////////////////////////
     // clean-up
-	for (int i = 0; i < spec.iNumChannels; i++)
+    outfile.close();
+    infile.close();
+    
+    for (int i = 0; i < spec.iNumChannels; i++)
 	{
 		delete[] inputAudioData[i];
 		delete[] outputAudioData[i];
