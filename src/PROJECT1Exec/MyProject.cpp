@@ -1,9 +1,10 @@
 
 // standard headers
+#include <iostream>
+#include <cmath>
 
 // project headers
 #include "ErrorDef.h"
-
 #include "MyProject.h"
 #include "FIRCombFilter.h"
 #include "IIRCombFilter.h"
@@ -11,16 +12,11 @@
 static const char*  kCMyProjectBuildDate             = __DATE__;
 
 
-CMyProject::CMyProject ()
-{
-    // this never hurts
-    this->reset ();
-}
+CMyProject::CMyProject () {}
 
 
-CMyProject::~CMyProject ()
-{
-    this->reset ();
+CMyProject::~CMyProject () {
+    this->reset();
 }
 
 const int  CMyProject::getVersion (const Version_t eVersionIdx)
@@ -50,17 +46,18 @@ const char*  CMyProject::getBuildDate ()
     return kCMyProjectBuildDate;
 }
 
-Error_t CMyProject::create(CMyProject*& pCMyProject, int type)
+Error_t CMyProject::create(CMyProject*& pCMyProject, int type, float delayTimeInSecs, float gain, long int sampleRate, int numChannels)
 {
 	if (type == 0)
 		pCMyProject = new FIRCombFilter();
 	else
 		pCMyProject = new IIRCombFilter();
+    
+    if (!pCMyProject)
+        return kUnknownError;
 
-	if (!pCMyProject)
-		return kUnknownError;
-
-
+    pCMyProject->init(delayTimeInSecs, gain, sampleRate, numChannels);
+    
 	return kNoError;
 }
 
@@ -69,8 +66,6 @@ Error_t CMyProject::destroy (CMyProject*& pCMyProject)
     if (!pCMyProject)
         return kUnknownError;
     
-    pCMyProject->reset ();
-    
     delete pCMyProject;
     pCMyProject = 0;
 
@@ -78,26 +73,50 @@ Error_t CMyProject::destroy (CMyProject*& pCMyProject)
 
 }
 
-Error_t CMyProject::init()
+Error_t CMyProject::init(float delayTimeInSecs, float gainValue, long int sampleRate, int numChannels)
 {
-    // allocate memory
-
-    // initialize variables and buffers
+    gain = gainValue;
+    filterSampleRate = sampleRate;
+    filterNumChannels = numChannels;
+    delayLineInSamples = getDelayLineInSamples(sampleRate, delayTimeInSecs);
+    
+    std::cout << delayLineInSamples << std::endl;
+    
+    delayBuffer = new float*[filterNumChannels];
+    
+    for(int i = 0; i < filterNumChannels; i++)
+    {
+        delayBuffer[i] = new float[delayLineInSamples];
+    }
+    
+    for(int i = 0; i < filterNumChannels; i++) {
+        for (int k = 0; k < delayLineInSamples; k++) {
+            delayBuffer[i][k] = 0.0F;
+        }
+    }
 
     return kNoError;
 }
 
-Error_t CMyProject::reset ()
-{
-    // reset buffers and variables to default values
-	delayLineInSecs = 0.0;
+Error_t CMyProject::reset () {
+    
+    std::cout << delayBuffer[0][0] << std::endl;
+    std::cout << filterNumChannels << std::endl;
+    for (int i = 0; i < filterNumChannels; i++)
+    {
+        delete[] delayBuffer[i];
+    }
+    delete[] delayBuffer;
+    delayLineInSamples = 0;
 	gain = 0.0;
+    filterNumChannels = 0;
+    filterSampleRate = 0;
     return kNoError;
 }
 
-float CMyProject::getDelayLineInSecs()
+float CMyProject::getDelayLineInSamples()
 {
-	return delayLineInSecs;
+	return delayLineInSamples;
 }
 
 float CMyProject::getGain()
@@ -105,9 +124,9 @@ float CMyProject::getGain()
 	return gain;
 }
 
-void CMyProject::setDelayLineInSecs(float paramVal)
+void CMyProject::setDelayLineInSamples(long int paramVal)
 {
-	delayLineInSecs = paramVal;
+	delayLineInSamples = paramVal;
 }
 
 void CMyProject::setGain(float paramVal)
@@ -115,7 +134,7 @@ void CMyProject::setGain(float paramVal)
 	gain = paramVal;
 }
 
-long int CMyProject::getDelayLineInSamples(long int fs)
+long int CMyProject::getDelayLineInSamples(long int fs, float delayLineInSecs)
 {
-	return fs*delayLineInSecs;
+	return roundf(fs*delayLineInSecs);
 }

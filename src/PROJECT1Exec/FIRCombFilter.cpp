@@ -11,45 +11,36 @@
 
 #include "FIRCombFilter.h"
 
-FIRCombFilter::FIRCombFilter() {
-    this->reset();
-}
+FIRCombFilter::FIRCombFilter() {}
 
-FIRCombFilter::~FIRCombFilter() {
-    this->reset();
-}
+FIRCombFilter::~FIRCombFilter() {}
 
-void FIRCombFilter::processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec, long long iInFileLength) {
-    
-    //Initialize delay line
-    long int delayLength = getDelayLineInSamples(spec.fSampleRateInHz);
-    float *delayLine = new float(delayLength);
-    
+Error_t FIRCombFilter::process(float **inputBuffer, float **outputBuffer, int numSamples) {
     //Implement filter
-    for (int channelId = 0; channelId < spec.iNumChannels; channelId++) {
-        for (int k = 0; k < delayLength; k++) {
-            delayLine[k] = 0.0F;
-        }
-        for (int dataId = 0; dataId < iInFileLength; dataId++) {
-            outputAudioData[channelId][dataId] = inputAudioData[channelId][dataId] + gain*delayLine[delayLength-1];
+    for (int channelId = 0; channelId < filterNumChannels; channelId++) {
+        for (int dataId = 0; dataId < numSamples; dataId++) {
+            outputBuffer[channelId][dataId] = inputBuffer[channelId][dataId] + gain*delayBuffer[channelId][delayLineInSamples-1];
             
-            for (int i = delayLength-1; i > 0 ; i--) {
-                delayLine[i] = delayLine[i-1];
+            for (int i = delayLineInSamples-1; i > 0 ; i--) {
+                delayBuffer[channelId][i] = delayBuffer[channelId][i-1];
             }
             
-            delayLine[0] = inputAudioData[channelId][dataId];
+            delayBuffer[channelId][0] = inputBuffer[channelId][dataId];
             
         }
     }
     
-    free(delayLine);
+    return kNoError;
 }
 
-void FIRCombFilter::setDelayLineInSecs(float paramVal) {
-    delayLineInSecs = paramVal;
+
+void FIRCombFilter::setDelayLineInSamples(long int paramVal)
+{
+    delayLineInSamples = paramVal;
 }
 
-void FIRCombFilter::setGain(float paramVal) {
+void FIRCombFilter::setGain(float paramVal)
+{
     gain = paramVal;
 }
 

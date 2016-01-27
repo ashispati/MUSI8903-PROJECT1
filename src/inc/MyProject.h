@@ -24,28 +24,33 @@ public:
     static const int  getVersion (const Version_t eVersionIdx);
     static const char* getBuildDate ();
 
-	static Error_t create(CMyProject*& pCKortIf, int type);
+	static Error_t create(CMyProject*& pCKortIf, int type, float delayTimeInSecs, float gain, long int sampleRate, int numChannels);
 	static Error_t destroy (CMyProject*& pCKortIf);
     
-    Error_t init (/*enter parameters here*/);
+    Error_t init (float delayTimeInSecs, float gain, long int sampleRate, int numChannels);
     Error_t reset ();
-
-	float getDelayLineInSecs();
-	float getGain();
-	//Set functions
-	virtual void setDelayLineInSecs(float paramVal);
-	virtual void setGain(float paramVal);
-	//filtering function
-    virtual void processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec, long long iInFileLength) = 0;
     
-    //virtual Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames) = 0;
+    //get functions
+	float getDelayLineInSamples();
+	float getGain();
+	
+	//filtering function
+    //virtual void processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec, long long iInFileLength) = 0;
+    virtual Error_t process (float **inputBuffer, float **outputBuffer, int numSamples) = 0;
 
 protected:
     CMyProject ();
     virtual ~CMyProject ();
-	long int getDelayLineInSamples(long int fs);
-	float delayLineInSecs;
-	float gain;
+    
+    long int delayLineInSamples;
+    float gain;
+    float** delayBuffer;
+    long int filterSampleRate;
+    int filterNumChannels;
+    
+	long int getDelayLineInSamples(long int fs, float delayLineInSecs);
+    virtual void setDelayLineInSamples(long int paramVal);
+    virtual void setGain(float paramVal);
     
 };
 

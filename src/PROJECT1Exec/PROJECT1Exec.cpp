@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
                             sOutputFilePath,
 							sInput2TxtPath;
 
-    long long               iInFileLength       = 0;        //!< length of input file
+    static const int        blockSize           = 1024;
 
 	float                   **inputAudioData	= 0,
 							**outputAudioData	= 0;
@@ -31,10 +31,11 @@ int main(int argc, char* argv[])
 
 	int						type				= 0;
 
-	float					delayLength			= 0.0,
+	float					delayTimeInSec			= 0.0,
 							gain				= 0.0;
 
 	CMyProject				*filter				= 0;
+    std::ofstream           outfile,infile;
 	showClInfo ();
 
     //////////////////////////////////////////////////////////////////////////////
@@ -52,11 +53,11 @@ int main(int argc, char* argv[])
 		break;
 	case 4: sInputFilePath = argv[1];
 		type = atoi(argv[2]);
-		delayLength = atof(argv[3]);
+		delayTimeInSec = atof(argv[3]);
 		break;
 	case 5: sInputFilePath = argv[1];
 		type = atoi(argv[2]);
-		delayLength = atof(argv[3]);
+		delayTimeInSec = atof(argv[3]);
 		gain = atof(argv[4]);
 		break;
 	default: cout << "Too many parameters. Check what you're entering." << endl;
@@ -69,49 +70,47 @@ int main(int argc, char* argv[])
     phAudioFile->openFile(sInputFilePath, CAudioFileIf::FileIoType_t::kFileRead);
     sOutputFilePath = sInputFilePath + "output.txt";
 	sInput2TxtPath = sInputFilePath + "input.txt";
+    outfile.open(sOutputFilePath);
+    infile.open(sInput2TxtPath);
     
     CAudioFileIf::FileSpec_t spec;
     phAudioFile->getFileSpec(spec);
-
-    phAudioFile->getLength(iInFileLength);
 
     inputAudioData = new float*[spec.iNumChannels];
 	outputAudioData = new float*[spec.iNumChannels];
     
     for(int i = 0; i < spec.iNumChannels; i++)
     {
-        inputAudioData[i] = new float[iInFileLength];
-		outputAudioData[i] = new float[iInFileLength];
+        inputAudioData[i] = new float[blockSize];
+		outputAudioData[i] = new float[blockSize];
     }
     
-    long long int numFrames = iInFileLength;
-    phAudioFile->readData(inputAudioData, numFrames);
     
     
     //////////////////////////////////////////////////////////////////////////////
     // do processing
-    //cout << "Hello there!" << endl << endl;
-	CMyProject::create(filter, type);
-	filter->setDelayLineInSecs(delayLength);
-	filter->setGain(gain);
-	filter->processFilter(inputAudioData, outputAudioData, spec, iInFileLength);
-	
+	CMyProject::create(filter, type, delayTimeInSec, gain, spec.fSampleRateInHz, spec.iNumChannels);
+    
+    while (!phAudioFile->isEof())
+    {
+        long long iNumFrames = blockSize;
+        phAudioFile->readData(inputAudioData, iNumFrames);
+        filter->process(inputAudioData, outputAudioData, iNumFrames);
+        for (int i = 0; i < spec.iNumChannels; i++)
+        {
+            for (int j = 0; j < iNumFrames; j++)
+            {
+                outfile << outputAudioData[i][j] << " ";
+                infile << inputAudioData[i][j] << " ";
+            }
+            outfile << endl;
+            infile << endl;
+        }
+        
+    }
     
     cout << "Exited" << endl;
-    // write data to files
-    std::ofstream outfile,infile;
-    outfile.open(sOutputFilePath);
-    infile.open(sInput2TxtPath);
-	for (int i = 0; i < spec.iNumChannels; i++)
-	{
-		for (int j = 0; j < iInFileLength; j++)
-		{
-			outfile << outputAudioData[i][j] << " ";
-			infile << inputAudioData[i][j] << " ";
-		}
-		outfile << endl;
-		infile << endl;
-	}
+    
     //////////////////////////////////////////////////////////////////////////////
     // clean-up
     outfile.close();

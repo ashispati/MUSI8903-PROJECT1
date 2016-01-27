@@ -18,13 +18,14 @@ public:
     
     ~IIRCombFilter();
     
-    void processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec, long long iInFileLength) override;
-    
-    void setDelayLineInSecs(float paramVal) override;
+    //void processFilter(float **inputAudioData, float **outputAudioData, CAudioFileIf::FileSpec_t spec, long long iInFileLength) override;
+    Error_t process (float **inputBuffer, float **outputBuffer, int numSamples) override;
+
+    void setDelayLineInSamples(long int paramVal) override;
     void setGain(float paramVal) override;
     
 private:
-    
+
 };
 
 
