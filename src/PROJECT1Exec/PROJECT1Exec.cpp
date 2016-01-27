@@ -22,6 +22,7 @@ void	Test1();
 void	Test2();
 void	Test3();
 void	Test4();
+void	Test5(int type);
 
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -117,6 +118,7 @@ int main(int argc, char* argv[])
 	else if (error_check == kFunctionInvalidArgsError)
 		cout << "Invalid filter parameters used. Delay should be positive and Gain should be between -1 and +1."<<endl;
     
+	cout << "Processing....." << endl;
     while (!phAudioFile->isEof())
     {
         long long iNumFrames = blockSize;
@@ -155,6 +157,8 @@ int main(int argc, char* argv[])
 	Test1();
 	Test2();
 	Test4();
+	Test5(0);
+	Test5(1);
 
     cout << "Done Processing" << endl;
 	system("pause");
@@ -186,11 +190,11 @@ void Test1()
 	CMyProject	*filter = 0;
 	float **sinewave, **output;
 	int flag = 1;
-	std::ofstream           outfile, infile;
+	/*std::ofstream           outfile, infile;
 	string sOutputFilePath = "C:/Users/SiddGururani/Desktop/output.txt";
 	string sInput2TxtPath = "C:/Users/SiddGururani/Desktop/input.txt";
 	outfile.open(sOutputFilePath);
-	infile.open(sInput2TxtPath);
+	infile.open(sInput2TxtPath);*/
 
 	//Generating a single channel sine wave of amplitude 1, frequency 441Hz and sampling frequency 44100Hz
 	sinewave = new float*[1];
@@ -203,11 +207,11 @@ void Test1()
 	//Filtering sine wave with delay of one period and gain of -1.
 	CMyProject::create(filter, 0, 1/441.0, -1, 44100, 1);
 	filter->process(sinewave, output, 44100);
-	for (int i = 0;i < 44100;i++)
+	/*for (int i = 0;i < 44100;i++)
 	{
 		outfile << output[0][i] << endl;
 		infile << sinewave[0][i] << endl;
-	}
+	}*/
 
 	for (int i = 101;i < 44100; i++)
 	{
@@ -227,8 +231,8 @@ void Test1()
 	delete[] output;
 	CMyProject::destroy(filter);
 
-	outfile.close();
-	infile.close();
+	//outfile.close();
+	//infile.close();
 	return;
 }
 
@@ -279,7 +283,7 @@ void Test2()
 	return;
 }
 
-void Test3()
+/*void Test3()
 {
 	CMyProject	*filter = 0;
 	int blocksize[] = {256, 512, 1024, 2048, 4096};
@@ -301,7 +305,7 @@ void Test3()
 
 		}
 	}
-}
+}*/
 
 void Test4()
 {
@@ -340,6 +344,49 @@ void Test4()
 	delete[] input;
 	delete[] output_FIR;
 	delete[] output_IIR;
+	CMyProject::destroy(filter);
+	return;
+}
+
+void Test5(int type)  //Test if when delay size is longer than input length, then output should be the same.
+{
+	CMyProject	*filter = 0;
+	float **sinewave, **output;
+	int flag = 1;
+
+	sinewave = new float*[1];
+	sinewave[0] = new float[44100];
+	genSineWave(sinewave[0], 1, 441.0, 1, 44100.0);
+
+	output = new float*[1];
+	output[0] = new float[44100];
+	//Filtering sine wave with delay of 1.1 seconds and gain of 0.5.
+	CMyProject::create(filter, type, 1.1, -1, 44100, 1);
+	filter->process(sinewave, output, 44100);
+
+	for (int i = 0;i < 44100;i++)
+	{
+		if (sinewave[0][i] != output[0][i])
+			flag = 0;
+	}
+	if (type == 1)
+	{
+		if (flag == 0)
+			cout << "Test 5 Failed for filter type: IIR" << endl;
+		else
+			cout << "Test 5 Passed for filter type: IIR" << endl;
+	}
+	else
+	{
+		if (flag == 0)
+			cout << "Test 5 Failed for filter type: FIR" << endl;
+		else
+			cout << "Test 5 Passed for filter type: FIR" << endl;
+	}
+	delete[] sinewave[0];
+	delete[] output[0];
+	delete[] sinewave;
+	delete[] output;
 	CMyProject::destroy(filter);
 	return;
 }
