@@ -33,18 +33,20 @@ Error_t IIRCombFilter::process(float **inputBuffer, float **outputBuffer, int nu
     return kNoError;
 }
 
-void IIRCombFilter::setDelayLineInSamples(long int paramVal)
+Error_t IIRCombFilter::setDelayLineInSamples(long int paramVal)
 {
     delayLineInSamples = paramVal;
+	return kNoError;
 }
 
-void IIRCombFilter::setGain(float paramVal) {
+Error_t IIRCombFilter::setGain(float paramVal) {
     if (fabs(paramVal) > 1)
     {
         std::cout << "Incorrect parameter value for filter gain. Magnitude should be <= 1" << std::endl;
-        exit(0);
-    }
+		return kFunctionInvalidArgsError;
+	}
     gain = paramVal;
+	return kNoError;
 }
 
 

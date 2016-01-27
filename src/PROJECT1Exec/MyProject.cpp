@@ -50,15 +50,20 @@ Error_t CMyProject::create(CMyProject*& pCMyProject, int type, float delayTimeIn
 {
 	if (type == 0)
 		pCMyProject = new FIRCombFilter();
-	else
+	else if (type == 1)
 		pCMyProject = new IIRCombFilter();
+	else
+		return kFunctionIllegalCallError;
+
+	if (delayTimeInSecs < 0)
+		return kFunctionInvalidArgsError;
     
     if (!pCMyProject)
         return kUnknownError;
 
-    pCMyProject->init(delayTimeInSecs, gain, sampleRate, numChannels);
+    return pCMyProject->init(delayTimeInSecs, gain, sampleRate, numChannels);
     
-	return kNoError;
+	//return kNoError;
 }
 
 Error_t CMyProject::destroy (CMyProject*& pCMyProject)
@@ -75,12 +80,19 @@ Error_t CMyProject::destroy (CMyProject*& pCMyProject)
 
 Error_t CMyProject::init(float delayTimeInSecs, float gainValue, long int sampleRate, int numChannels)
 {
-    gain = gainValue;
+    //gain = gainValue;
+	Error_t check;
+	check = this->setGain(gainValue);
+	if (check != kNoError)
+		return check;
     filterSampleRate = sampleRate;
+	check = this->setDelayLineInSamples(getDelayLineInSamples(sampleRate, delayTimeInSecs));
+	if (check != kNoError)
+		return check;
     filterNumChannels = numChannels;
-    delayLineInSamples = getDelayLineInSamples(sampleRate, delayTimeInSecs);
+    //delayLineInSamples = getDelayLineInSamples(sampleRate, delayTimeInSecs);
     
-    std::cout << delayLineInSamples << std::endl;
+    //std::cout << delayLineInSamples << std::endl;
     
     delayBuffer = new float*[filterNumChannels];
     
@@ -100,8 +112,8 @@ Error_t CMyProject::init(float delayTimeInSecs, float gainValue, long int sample
 
 Error_t CMyProject::reset () {
     
-    std::cout << delayBuffer[0][0] << std::endl;
-    std::cout << filterNumChannels << std::endl;
+    //std::cout << delayBuffer[0][0] << std::endl;
+    //std::cout << filterNumChannels << std::endl;
     for (int i = 0; i < filterNumChannels; i++)
     {
         delete[] delayBuffer[i];
@@ -114,7 +126,7 @@ Error_t CMyProject::reset () {
     return kNoError;
 }
 
-float CMyProject::getDelayLineInSamples()
+long int CMyProject::getDelayLineInSamples()
 {
 	return delayLineInSamples;
 }
@@ -124,14 +136,22 @@ float CMyProject::getGain()
 	return gain;
 }
 
-void CMyProject::setDelayLineInSamples(long int paramVal)
+//WHY ARE WE USING SET FUNCTIONS HERE WHEN THEY ARE VIRTUAL FUNCTIONS AND WE'RE EVENTUALLY OVERRIDING THEM IN ALL THE SUBCLASSES?
+//
+//										ATTENTION!!!!!
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Error_t CMyProject::setDelayLineInSamples(long int paramVal)
 {
 	delayLineInSamples = paramVal;
+	return kNoError;
 }
 
-void CMyProject::setGain(float paramVal)
+Error_t CMyProject::setGain(float paramVal)
 {
 	gain = paramVal;
+	return kNoError;
 }
 
 long int CMyProject::getDelayLineInSamples(long int fs, float delayLineInSecs)

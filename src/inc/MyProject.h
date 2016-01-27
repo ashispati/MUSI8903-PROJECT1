@@ -31,7 +31,7 @@ public:
     Error_t reset ();
     
     //get functions
-	float getDelayLineInSamples();
+	long int getDelayLineInSamples();
 	float getGain();
 	
 	//filtering function
@@ -49,8 +49,8 @@ protected:
     int filterNumChannels;
     
 	long int getDelayLineInSamples(long int fs, float delayLineInSecs);
-    virtual void setDelayLineInSamples(long int paramVal);
-    virtual void setGain(float paramVal);
+    virtual Error_t setDelayLineInSamples(long int paramVal);
+    virtual Error_t setGain(float paramVal);
     
 };
 
