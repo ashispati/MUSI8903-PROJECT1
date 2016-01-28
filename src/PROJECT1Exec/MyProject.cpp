@@ -136,24 +136,6 @@ float CMyProject::getGain()
 	return gain;
 }
 
-//WHY ARE WE USING SET FUNCTIONS HERE WHEN THEY ARE VIRTUAL FUNCTIONS AND WE'RE EVENTUALLY OVERRIDING THEM IN ALL THE SUBCLASSES?
-//
-//										ATTENTION!!!!!
-//
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Error_t CMyProject::setDelayLineInSamples(long int paramVal)
-{
-	delayLineInSamples = paramVal;
-	return kNoError;
-}
-
-Error_t CMyProject::setGain(float paramVal)
-{
-	gain = paramVal;
-	return kNoError;
-}
-
 long int CMyProject::getDelayLineInSamples(long int fs, float delayLineInSecs)
 {
 	return roundf(fs*delayLineInSecs);

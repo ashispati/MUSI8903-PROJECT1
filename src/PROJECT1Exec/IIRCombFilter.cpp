@@ -16,11 +16,9 @@ IIRCombFilter::IIRCombFilter() {}
 IIRCombFilter::~IIRCombFilter() {}
 
 Error_t IIRCombFilter::process(float **inputBuffer, float **outputBuffer, int numSamples) {
-    //Implement filter
     for (int channelId = 0; channelId < filterNumChannels; channelId++) {
         for (int dataId = 0; dataId < numSamples; dataId++) {
             outputBuffer[channelId][dataId] = inputBuffer[channelId][dataId] + gain*delayBuffer[channelId][delayLineInSamples-1];
-            
             for (int i = delayLineInSamples-1; i > 0 ; i--) {
                 delayBuffer[channelId][i] = delayBuffer[channelId][i-1];
             }

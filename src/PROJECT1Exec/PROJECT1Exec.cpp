@@ -20,7 +20,7 @@ using namespace std;
 void    showClInfo ();
 void	Test1();
 void	Test2();
-void	Test3();
+void    Test3(int blockSize1 = 1024, int blockSize2 = 512, int filterType = 0);
 void	Test4();
 void	Test5(int type);
 
@@ -52,10 +52,6 @@ int main(int argc, char* argv[])
 
     //////////////////////////////////////////////////////////////////////////////
     // parse command line arguments
-	// It's not really possible to check if the user actually input the correct data.
-	// atoi and atof will automatically return 0 if the string isn't a valid type.
-	// Use stoi and stof
-	
 	try
 	{
 		switch (argc)
@@ -136,8 +132,8 @@ int main(int argc, char* argv[])
         }
     }
     
-    cout << "Exited" << endl;
-    
+	cout << "Done Processing" << endl;
+
     //////////////////////////////////////////////////////////////////////////////
     // clean-up
     outfile.close();
@@ -156,12 +152,12 @@ int main(int argc, char* argv[])
 
 	Test1();
 	Test2();
+	Test3(1024, 512, 0);
+	Test3(123, 765, 1);
 	Test4();
 	Test5(0);
 	Test5(1);
 
-    cout << "Done Processing" << endl;
-	system("pause");
     return 0;
     
 }
@@ -170,7 +166,7 @@ int main(int argc, char* argv[])
 void     showClInfo()
 {
     cout << "GTCMT MUSI-8903" << endl;
-    cout << "(c) 2016 by Sid and Ashis" << endl;
+    cout << "(c) 2016 by Sidd and Ashis" << endl;
     cout  << endl;
 
     return;
@@ -190,11 +186,6 @@ void Test1()
 	CMyProject	*filter = 0;
 	float **sinewave, **output;
 	int flag = 1;
-	/*std::ofstream           outfile, infile;
-	string sOutputFilePath = "C:/Users/SiddGururani/Desktop/output.txt";
-	string sInput2TxtPath = "C:/Users/SiddGururani/Desktop/input.txt";
-	outfile.open(sOutputFilePath);
-	infile.open(sInput2TxtPath);*/
 
 	//Generating a single channel sine wave of amplitude 1, frequency 441Hz and sampling frequency 44100Hz
 	sinewave = new float*[1];
@@ -207,17 +198,11 @@ void Test1()
 	//Filtering sine wave with delay of one period and gain of -1.
 	CMyProject::create(filter, 0, 1/441.0, -1, 44100, 1);
 	filter->process(sinewave, output, 44100);
-	/*for (int i = 0;i < 44100;i++)
-	{
-		outfile << output[0][i] << endl;
-		infile << sinewave[0][i] << endl;
-	}*/
 
 	for (int i = 101;i < 44100; i++)
 	{
 		if (output[0][i] > 0.00005) //Tolerance for 0 value is set to 0.00005
 		{
-			//cout << sinewave[0][i] << "\t" << output[0][i] << endl;
 			flag = 0;
 		}
 	}
@@ -230,9 +215,6 @@ void Test1()
 	delete[] sinewave;
 	delete[] output;
 	CMyProject::destroy(filter);
-
-	//outfile.close();
-	//infile.close();
 	return;
 }
 
@@ -283,29 +265,128 @@ void Test2()
 	return;
 }
 
-/*void Test3()
+void Test3(int blockSize1, int blockSize2, int filterType)
 {
-	CMyProject	*filter = 0;
-	int blocksize[] = {256, 512, 1024, 2048, 4096};
-	float **input, **output_new, **output_old;
-	input = new float*[1];
-	output_old = new float*[1];
-	output_new = new float*[1];
-	input[0] = new float[8096];
-	output_old[0] = new float[8096];
-	output_new[0] = new float[8096];
+	CMyProject	*filter1, *filter2 = 0;
+	float **inputBuffer1, **inputBuffer2 = 0;
+	float **outputBuffer1, **outputBuffer2 = 0;
+	float **filterOut1, **filterOut2 = 0;
+	float** sinewave = new float*[1];
+	sinewave[0] = new float[44100];
+	genSineWave(sinewave[0], 1, 441.0, 1, 44100.0);
+	int flag = 1;
 
-	genSineWave(input[0], 1, 441.0, 44100/4096, 44100.0);
-	for (int i = 0; i < 5; i++)
+	//allocate memory to arrays
+	inputBuffer1 = new float*[1];
+	inputBuffer2 = new float*[1];
+	outputBuffer1 = new float*[1];
+	outputBuffer2 = new float*[1];
+	filterOut1 = new float*[1];
+	filterOut2 = new float*[1];
+
+	for (int i = 0; i < 1; i++)
 	{
-		CMyProject::create(filter, 1, 1 / 441.0, 0.5, 44100, 1);
-		int num_blocks = 8096 / blocksize[0];
-		for (int j = 0; j < num_blocks; j++)
-		{
+		inputBuffer1[i] = new float[blockSize1];
+		inputBuffer2[i] = new float[blockSize2];
+		outputBuffer1[i] = new float[blockSize1];
+		outputBuffer2[i] = new float[blockSize2];
+		filterOut1[i] = new float[44100];
+		filterOut2[i] = new float[44100];
+	}
 
+	//create filters
+	CMyProject::create(filter1, filterType, 0.01, 0.5, 44100, 1);
+	CMyProject::create(filter2, filterType, 0.01, 0.5, 44100, 1);
+
+	int numSamplesRemaining = 44100;
+	int loopCounter = 0;
+	while (numSamplesRemaining > 0) {
+		long long iNumFrames = blockSize1;
+		if (numSamplesRemaining - iNumFrames <= 0) {
+			iNumFrames = numSamplesRemaining;
+		}
+		//read wave information into the input array
+		for (int channelID = 0; channelID < 1; channelID++) {
+			for (int i = 0; i < iNumFrames; i++) {
+				inputBuffer1[channelID][i] = sinewave[channelID][loopCounter*blockSize1 + i];
+			}
+		}
+		filter1->process(inputBuffer1, outputBuffer1, iNumFrames);
+		//write filter out to the array
+		for (int channelID = 0; channelID < 1; channelID++) {
+			for (int i = 0; i < iNumFrames; i++) {
+				filterOut1[channelID][loopCounter*blockSize1 + i] = outputBuffer1[channelID][i];
+			}
+		}
+		loopCounter++;
+		numSamplesRemaining = numSamplesRemaining - iNumFrames;
+	}
+
+	numSamplesRemaining = 44100;
+	loopCounter = 0;
+	while (numSamplesRemaining > 0) {
+		long long iNumFrames = blockSize2;
+		if (numSamplesRemaining - iNumFrames <= 0) {
+			iNumFrames = numSamplesRemaining;
+		}
+		//read wave information into the input array
+		for (int channelID = 0; channelID < 1; channelID++) {
+			for (int i = 0; i < iNumFrames; i++) {
+				inputBuffer2[channelID][i] = sinewave[channelID][loopCounter*blockSize2 + i];
+			}
+		}
+		filter2->process(inputBuffer2, outputBuffer2, iNumFrames);
+		//write filter out to the array
+		for (int channelID = 0; channelID < 1; channelID++) {
+			for (int i = 0; i < iNumFrames; i++) {
+				filterOut2[channelID][loopCounter*blockSize2 + i] = outputBuffer2[channelID][i];
+			}
+		}
+		loopCounter++;
+		numSamplesRemaining = numSamplesRemaining - iNumFrames;
+	}
+
+	for (int channelID = 0; channelID < 1; channelID++) {
+		for (int i = 0; i < 44100; i++) {
+			if (fabs(filterOut1[channelID][i] - filterOut2[channelID][i]) > 0.00001) {
+				flag = 0;
+			}
 		}
 	}
-}*/
+
+	if (filterType == 0)
+	{
+		if (flag == 0)
+			cout << "Test 3 Failed for filter type: FIR" << endl;
+		else
+			cout << "Test 3 Passed for filter type: FIR" << endl;
+	}
+	else
+	{
+		if (flag == 0)
+			cout << "Test 3 Failed for filter type: IIR" << endl;
+		else
+			cout << "Test 3 Passed for filter type: IIR" << endl;
+	}
+
+	delete[] inputBuffer1[0];
+	delete[] inputBuffer1;
+	delete[] inputBuffer2[0];
+	delete[] inputBuffer2;
+	delete[] outputBuffer1[0];
+	delete[] outputBuffer1;
+	delete[] outputBuffer2[0];
+	delete[] outputBuffer2;
+	delete[] filterOut1[0];
+	delete[] filterOut1;
+	delete[] filterOut2[0];
+	delete[] filterOut2;
+	delete[] sinewave[0];
+	delete[] sinewave;
+
+	CMyProject::destroy(filter1);
+	CMyProject::destroy(filter2);
+}
 
 void Test4()
 {
@@ -335,9 +416,9 @@ void Test4()
 			flag = 0;
 	}
 	if (flag == 0)
-		cout << "Test 4 Failed" << endl;
+		cout << "Test 4 Failed for both filters" << endl;
 	else
-		cout << "Test 4 Passed" << endl;
+		cout << "Test 4 Passed for both filters" << endl;
 	delete[] input[0];
 	delete[] output_FIR[0];
 	delete[] output_IIR[0];
